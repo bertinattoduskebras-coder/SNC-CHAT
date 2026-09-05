@@ -1,108 +1,93 @@
 ```lua
---// CHAT SECUNDÁRIO SONECAZ
---// Coloque este LocalScript em:
---// StarterPlayer > StarterPlayerScripts
+-- CHAT SECUNDARIO SONECAZ
+-- Coloque em StarterPlayer > StarterPlayerScripts
 
 local Players = game:GetService("Players")
-local TextChatService = game:GetService("TextChatService")
-local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
 local LocalPlayer = Players.LocalPlayer
-
---------------------------------------------------
--- CONFIGURAÇÕES
---------------------------------------------------
+local Event = ReplicatedStorage:WaitForChild("SonecaZChatEvent")
 
 local OWNER_USER_ID = 10368308763
 
-local CHAT_WIDTH = 520
-local CHAT_HEIGHT = 300
-
-local BACKGROUND_TRANSPARENCY = 0.38
-
 --------------------------------------------------
--- GUI PRINCIPAL
+-- GUI
 --------------------------------------------------
 
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "SonecaZSecondaryChat"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.IgnoreGuiInset = true
-ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+local Gui = Instance.new("ScreenGui")
+Gui.Name = "SonecaZChat"
+Gui.ResetOnSpawn = false
+Gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
 --------------------------------------------------
--- BOTÃO DO CHAT
+-- BOTÃO
 --------------------------------------------------
 
-local OpenButton = Instance.new("TextButton")
-OpenButton.Name = "ChatButton"
-OpenButton.Size = UDim2.fromOffset(48, 48)
-OpenButton.Position = UDim2.new(0, 20, 1, -70)
-OpenButton.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-OpenButton.BackgroundTransparency = 0.18
-OpenButton.BorderSizePixel = 0
-OpenButton.Text = "💬"
-OpenButton.TextSize = 23
-OpenButton.Font = Enum.Font.GothamBold
-OpenButton.Parent = ScreenGui
+local Button = Instance.new("TextButton")
+Button.Size = UDim2.fromOffset(50, 50)
+Button.Position = UDim2.new(0, 20, 1, -75)
+Button.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Button.BackgroundTransparency = 0.15
+Button.Text = "💬"
+Button.TextSize = 23
+Button.Font = Enum.Font.GothamBold
+Button.TextColor3 = Color3.new(1,1,1)
+Button.Parent = Gui
 
 local ButtonCorner = Instance.new("UICorner")
-ButtonCorner.CornerRadius = UDim.new(1, 0)
-ButtonCorner.Parent = OpenButton
+ButtonCorner.CornerRadius = UDim.new(1,0)
+ButtonCorner.Parent = Button
 
 --------------------------------------------------
--- CHAT
+-- JANELA
 --------------------------------------------------
 
-local Main = Instance.new("Frame")
-Main.Name = "SecondaryChat"
-Main.Size = UDim2.fromOffset(CHAT_WIDTH, CHAT_HEIGHT)
-Main.Position = UDim2.new(0, 25, 1, -CHAT_HEIGHT - 80)
-Main.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
-Main.BackgroundTransparency = BACKGROUND_TRANSPARENCY
-Main.BorderSizePixel = 0
-Main.Parent = ScreenGui
+local Chat = Instance.new("Frame")
+Chat.Size = UDim2.fromOffset(520, 300)
+Chat.Position = UDim2.new(0, 25, 1, -390)
+Chat.BackgroundColor3 = Color3.fromRGB(15,15,15)
+Chat.BackgroundTransparency = 0.38
+Chat.BorderSizePixel = 0
+Chat.Parent = Gui
 
-local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 12)
-MainCorner.Parent = Main
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 12)
+Corner.Parent = Chat
 
 --------------------------------------------------
--- MARCA D'ÁGUA
+-- SONECAZ NO FUNDO
 --------------------------------------------------
 
 local Watermark = Instance.new("TextLabel")
-Watermark.Name = "Watermark"
-Watermark.Size = UDim2.new(1, 0, 1, 0)
-Watermark.Position = UDim2.new(0, 0, 0, 0)
+Watermark.Size = UDim2.new(1,0,1,0)
 Watermark.BackgroundTransparency = 1
 Watermark.Text = "SonecaZ"
 Watermark.Font = Enum.Font.GothamBlack
-Watermark.TextSize = 70
-Watermark.TextColor3 = Color3.fromRGB(0, 0, 0)
-Watermark.TextTransparency = 0.72
+Watermark.TextSize = 65
+Watermark.TextColor3 = Color3.fromRGB(0,0,0)
+Watermark.TextTransparency = 0.65
 Watermark.ZIndex = 0
-Watermark.Parent = Main
+Watermark.Parent = Chat
 
 --------------------------------------------------
--- ÁREA DAS MENSAGENS
+-- MENSAGENS
 --------------------------------------------------
 
 local Messages = Instance.new("ScrollingFrame")
-Messages.Name = "Messages"
-Messages.Size = UDim2.new(1, -16, 1, -60)
-Messages.Position = UDim2.fromOffset(8, 8)
+Messages.Size = UDim2.new(1,-16,1,-58)
+Messages.Position = UDim2.fromOffset(8,8)
 Messages.BackgroundTransparency = 1
 Messages.BorderSizePixel = 0
 Messages.ScrollBarThickness = 3
 Messages.AutomaticCanvasSize = Enum.AutomaticSize.Y
-Messages.CanvasSize = UDim2.new(0, 0, 0, 0)
+Messages.CanvasSize = UDim2.new(0,0,0,0)
 Messages.ZIndex = 2
-Messages.Parent = Main
+Messages.Parent = Chat
 
 local Layout = Instance.new("UIListLayout")
-Layout.Padding = UDim.new(0, 4)
+Layout.Padding = UDim.new(0,3)
 Layout.SortOrder = Enum.SortOrder.LayoutOrder
 Layout.Parent = Messages
 
@@ -111,74 +96,46 @@ Layout.Parent = Messages
 --------------------------------------------------
 
 local Input = Instance.new("TextBox")
-Input.Name = "Input"
-Input.Size = UDim2.new(1, -16, 0, 38)
-Input.Position = UDim2.new(0, 8, 1, -46)
-Input.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-Input.BackgroundTransparency = 0.35
+Input.Size = UDim2.new(1,-16,0,38)
+Input.Position = UDim2.new(0,8,1,-46)
+Input.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Input.BackgroundTransparency = 0.3
 Input.BorderSizePixel = 0
-Input.ClearTextOnFocus = false
-Input.Font = Enum.Font.Gotham
-Input.TextSize = 15
-Input.TextColor3 = Color3.fromRGB(255, 255, 255)
-Input.PlaceholderColor3 = Color3.fromRGB(170, 170, 170)
-Input.PlaceholderText = "Digite uma mensagem..."
 Input.Text = ""
+Input.PlaceholderText = "Digite uma mensagem..."
+Input.PlaceholderColor3 = Color3.fromRGB(170,170,170)
+Input.TextColor3 = Color3.new(1,1,1)
+Input.TextSize = 15
+Input.Font = Enum.Font.Gotham
 Input.TextXAlignment = Enum.TextXAlignment.Left
+Input.ClearTextOnFocus = false
 Input.ZIndex = 3
-Input.Parent = Main
+Input.Parent = Chat
 
-local InputPadding = Instance.new("UIPadding")
-InputPadding.PaddingLeft = UDim.new(0, 12)
-InputPadding.Parent = Input
+local Padding = Instance.new("UIPadding")
+Padding.PaddingLeft = UDim.new(0,12)
+Padding.Parent = Input
 
 local InputCorner = Instance.new("UICorner")
-InputCorner.CornerRadius = UDim.new(0, 8)
+InputCorner.CornerRadius = UDim.new(0,8)
 InputCorner.Parent = Input
 
 --------------------------------------------------
--- COR DO NOME
+-- CORES DOS NOMES
 --------------------------------------------------
 
 local function GetNameColor(name)
 
 	local hash = 0
 
-	for i = 1, #name do
-		hash = (hash * 31 + string.byte(name, i)) % 360
+	for i = 1,#name do
+		hash = (hash * 31 + string.byte(name,i)) % 360
 	end
 
-	local hue = hash / 360
-
-	return Color3.fromHSV(hue, 0.75, 1)
+	return Color3.fromHSV(hash / 360,0.75,1)
 end
 
---------------------------------------------------
--- RICH TEXT SEGURO
---------------------------------------------------
-
-local function EscapeRichText(text)
-
-	text = string.gsub(text, "&", "&amp;")
-	text = string.gsub(text, "<", "&lt;")
-	text = string.gsub(text, ">", "&gt;")
-	text = string.gsub(text, '"', "&quot;")
-
-	return text
-end
-
---------------------------------------------------
--- RGB
---------------------------------------------------
-
-local function GetRGBColor(time)
-
-	local hue = (time % 5) / 5
-
-	return Color3.fromHSV(hue, 0.9, 1)
-end
-
-local function ToHex(color)
+local function Hex(color)
 
 	return string.format(
 		"#%02X%02X%02X",
@@ -190,33 +147,13 @@ local function ToHex(color)
 end
 
 --------------------------------------------------
--- CRIAR MENSAGEM
+-- MENSAGEM RECEBIDA
 --------------------------------------------------
 
-local function AddMessage(message)
-
-	local TextSource = message.TextSource
-
-	if not TextSource then
-		return
-	end
-
-	local player = Players:GetPlayerByUserId(TextSource.UserId)
-
-	if not player then
-		return
-	end
-
-	local name = player.DisplayName
-	local messageText = EscapeRichText(message.Text)
-
-	local nameColor = GetNameColor(name)
-	local nameHex = ToHex(nameColor)
+Event.OnClientEvent:Connect(function(userId, name, text)
 
 	local Line = Instance.new("TextLabel")
-
-	Line.Name = "Message"
-	Line.Size = UDim2.new(1, -5, 0, 24)
+	Line.Size = UDim2.new(1,-5,0,24)
 	Line.AutomaticSize = Enum.AutomaticSize.Y
 	Line.BackgroundTransparency = 1
 	Line.TextWrapped = true
@@ -225,56 +162,52 @@ local function AddMessage(message)
 	Line.TextSize = 15
 	Line.TextXAlignment = Enum.TextXAlignment.Left
 	Line.TextYAlignment = Enum.TextYAlignment.Top
-	Line.TextColor3 = Color3.fromRGB(255, 255, 255)
+	Line.TextColor3 = Color3.new(1,1,1)
 	Line.ZIndex = 3
+	Line.Parent = Messages
 
-	--------------------------------------------------
-	-- DONO
-	--------------------------------------------------
+	local nameColor = Hex(GetNameColor(name))
 
-	if player.UserId == OWNER_USER_ID then
+	if userId == OWNER_USER_ID then
 
 		Line.Text =
 			'<font color="#FFFFFF"><b>[</b></font>' ..
 			'<font color="#FF0000"><b>DONO</b></font>' ..
 			'<font color="#FFFFFF"><b>]</b></font> ' ..
-			'<font color="' .. nameHex .. '"><b>' ..
+			'<font color="' .. nameColor .. '"><b>' ..
 			name ..
 			'</b></font>: ' ..
-			messageText
+			text
 
-		Line.Parent = Messages
-
-		-- RGB + piscando rápido
 		task.spawn(function()
 
-			local startTime = os.clock()
+			local hue = 0
+			local blink = false
 
 			while Line.Parent do
 
-				local elapsed = os.clock() - startTime
+				hue = (hue + 0.025) % 1
+				blink = not blink
 
-				local rgb = GetRGBColor(elapsed)
-				local hex = ToHex(rgb)
+				local rgb = Color3.fromHSV(hue,1,1)
+				local rgbHex = Hex(rgb)
 
-				local blink = math.sin(elapsed * 11) > 0
-
-				local tagColor = hex
+				local donoColor = rgbHex
 
 				if not blink then
-					tagColor = "#555555"
+					donoColor = "#555555"
 				end
 
 				Line.Text =
 					'<font color="#FFFFFF"><b>[</b></font>' ..
-					'<font color="' .. tagColor .. '"><b>DONO</b></font>' ..
+					'<font color="' .. donoColor .. '"><b>DONO</b></font>' ..
 					'<font color="#FFFFFF"><b>]</b></font> ' ..
-					'<font color="' .. nameHex .. '"><b>' ..
+					'<font color="' .. nameColor .. '"><b>' ..
 					name ..
 					'</b></font>: ' ..
-					messageText
+					text
 
-				task.wait(0.04)
+				task.wait(0.05)
 			end
 
 		end)
@@ -282,31 +215,11 @@ local function AddMessage(message)
 	else
 
 		Line.Text =
-			'<font color="' .. nameHex .. '"><b>' ..
+			'<font color="' .. nameColor .. '"><b>' ..
 			name ..
 			'</b></font>: ' ..
-			messageText
+			text
 
-		Line.Parent = Messages
-
-	end
-
-	--------------------------------------------------
-	-- LIMITE DE MENSAGENS
-	--------------------------------------------------
-
-	local labels = {}
-
-	for _, child in ipairs(Messages:GetChildren()) do
-
-		if child:IsA("TextLabel") then
-			table.insert(labels, child)
-		end
-
-	end
-
-	if #labels > 60 then
-		labels[1]:Destroy()
 	end
 
 	task.wait()
@@ -316,49 +229,25 @@ local function AddMessage(message)
 		Messages.AbsoluteCanvasSize.Y
 	)
 
-end
-
---------------------------------------------------
--- RECEBER SOMENTE O CHAT SECUNDÁRIO
---------------------------------------------------
-
-TextChatService.MessageReceived:Connect(function(message)
-
-	local textChannel = message.TextChannel
-
-	if not textChannel then
-		return
-	end
-
-	if textChannel.Name ~= "SonecaZChat" then
-		return
-	end
-
-	AddMessage(message)
-
 end)
 
 --------------------------------------------------
--- ENVIAR PARA O CHAT SECUNDÁRIO
+-- ENVIAR MENSAGEM
 --------------------------------------------------
 
-Input.FocusLost:Connect(function(enterPressed)
+Input.FocusLost:Connect(function(enter)
 
-	if not enterPressed then
+	if not enter then
 		return
 	end
 
-	local text = Input.Text
-
-	if text == "" then
+	if Input.Text == "" then
 		return
 	end
+
+	Event:FireServer(Input.Text)
 
 	Input.Text = ""
-
-	local channel = TextChatService:WaitForChild("SonecaZChat")
-
-	channel:SendAsync(text)
 
 end)
 
@@ -366,53 +255,36 @@ end)
 -- MOSTRAR / ESCONDER
 --------------------------------------------------
 
-local chatVisible = true
+Button.MouseButton1Click:Connect(function()
 
-OpenButton.MouseButton1Click:Connect(function()
-
-	chatVisible = not chatVisible
-
-	Main.Visible = chatVisible
+	Chat.Visible = not Chat.Visible
 
 end)
 
 --------------------------------------------------
--- CHAT ARRASTÁVEL
+-- ARRASTAR CHAT
 --------------------------------------------------
 
 local dragging = false
 local dragStart
 local startPosition
 
-local function UpdateDrag(input)
-
-	local delta = input.Position - dragStart
-
-	Main.Position = UDim2.new(
-		startPosition.X.Scale,
-		startPosition.X.Offset + delta.X,
-		startPosition.Y.Scale,
-		startPosition.Y.Offset + delta.Y
-	)
-
-end
-
-Main.InputBegan:Connect(function(input)
+Chat.InputBegan:Connect(function(input)
 
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
 
 		dragging = true
 		dragStart = input.Position
-		startPosition = Main.Position
+		startPosition = Chat.Position
 
-		input.Changed:Connect(function()
+	end
 
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
+end)
 
-		end)
+UserInputService.InputEnded:Connect(function(input)
 
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
 	end
 
 end)
@@ -420,7 +292,16 @@ end)
 UserInputService.InputChanged:Connect(function(input)
 
 	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-		UpdateDrag(input)
+
+		local delta = input.Position - dragStart
+
+		Chat.Position = UDim2.new(
+			startPosition.X.Scale,
+			startPosition.X.Offset + delta.X,
+			startPosition.Y.Scale,
+			startPosition.Y.Offset + delta.Y
+		)
+
 	end
 
 end)
